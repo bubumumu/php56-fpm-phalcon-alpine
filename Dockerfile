@@ -47,11 +47,10 @@ RUN git clone https://github.com/php-memcached-dev/php-memcached.git && \
 	
 ENV PHPREDIS_VERSION=3.0.0
 
-RUN set -xe && \
-	curl -LO https://github.com/phpredis/phpredis/archive/${PHPREDIS_VERSION}.tar.gz && \
-	tar xzf ${PHPREDIS_VERSION}.tar.gz && cd phpredis-${PHPREDIS_VERSION} && phpize && ./configure --enable-redis-igbinary && make && make install && \
-	echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini && \
-	cd ../ && rm -rf  phpredis-${PHPREDIS_VERSION} ${PHPREDIS_VERSION}.tar.gz
+RUN git clone -b master https://github.com/phpredis/phpredis.git \
+	&& docker-php-ext-configure phpredis \
+	&& docker-php-ext-install phpredis \
+	&& rm -rf phpredis
 	
 ENV PHALCON_VERSION=3.0.1
 
