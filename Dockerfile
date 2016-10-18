@@ -45,6 +45,7 @@ RUN git clone https://github.com/php-memcached-dev/php-memcached.git && \
 	echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini && \
 	cd .. && rm -rf php-memcached 
 	
+# Compile PhpRedis
 ENV PHPREDIS_VERSION=3.0.0
 
 RUN git clone -b master https://github.com/phpredis/phpredis.git \
