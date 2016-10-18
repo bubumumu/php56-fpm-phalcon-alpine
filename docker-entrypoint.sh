@@ -15,6 +15,7 @@ if [ ! -f /xdebug_configured ]; then
 		IDEKEY="PHPSTORM"
 	fi
     echo "=> Xdebug is not configured yet, configuring Xdebug ..."
+	echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/xdebug.ini
     echo "xdebug.remote_enable=$XDEBUG_ENABLE" >> /usr/local/etc/php/conf.d/xdebug.ini
     echo "xdebug.remote_host=$DOCKER_HOST_IP" >> /usr/local/etc/php/conf.d/xdebug.ini
     echo "xdebug.remote_port=$XDEBUG_PORT" >> /usr/local/etc/php/conf.d/xdebug.ini

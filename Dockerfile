@@ -68,6 +68,13 @@ RUN docker-php-source extract \
 	&& phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install \
 	&& make clean \
 	&& docker-php-source delete
+
+#Compile XDebug
+RUN set -xe && \
+	curl -LO https://github.com/xdebug/xdebug/archive/XDEBUG_2_4_1.tar.gz && \
+	tar xzf XDEBUG_2_4_1.tar.gz && cd xdebug-XDEBUG_2_4_1 && \
+	phpize && ./configure --enable-xdebug && make && make install && \
+	cd ../ && rm -rf xdebug-XDEBUG_2_4_1
 	
 #Delete apk
 RUN apk del gcc g++ git make && \
