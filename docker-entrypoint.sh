@@ -1,6 +1,5 @@
 #!/bin/sh
 set -eo pipefail
-shopt -s nullglob
 
 if [ ! -f /xdebug_configured ]; then
 	if [ -z $XDEBUG_ENABLE ]; then
