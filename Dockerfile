@@ -28,6 +28,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
         && docker-php-ext-install bz2 \
         && docker-php-ext-install zip \
         && docker-php-ext-install pdo \
+		&& docker-php-ext-install mcrypt \
         && docker-php-ext-install pdo_mysql \
         && docker-php-ext-install opcache
 
