@@ -19,6 +19,8 @@ RUN apk add --update git make gcc g++ \
 	libmemcached-dev \
 	cyrus-sasl-dev \
 	bzip2 \
+	php5-memcached \
+	php5-imagick \
 	&& rm -rf /var/cache/apk/* 
 
 
@@ -34,18 +36,13 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 		
 WORKDIR /usr/src/php/ext/
 
-RUN git clone  https://github.com/igbinary/igbinary.git && \
-	cd igbinary && phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary && make install && \
+RUN set -xe && \
+	curl -LO https://github.com/igbinary/igbinary/archive/2.0.4.tar.gz && \
+	tar xzf 2.0.4.tar.gz && \
+	cd igbinary-2.0.4 && phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary --with-php-config=/usr/local/bin/php-config && make install && \
 	echo "extension=igbinary.so" > /usr/local/etc/php/conf.d/igbinary.ini && \
 	cd ../ && rm -rf igbinary
 	
-# Compile Memcached 
-RUN set -xe && \
-	curl -LO https://github.com/php-memcached-dev/php-memcached/archive/v1.0.2.tar.gz && \
-	tar xzf v1.0.2.tar.gz && cd php-memcached-1.0.2 && \
-	phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install && \
-	echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini && \
-	cd .. && rm -rf php-memcached 
 	
 # Compile PhpRedis
 ENV PHPREDIS_VERSION=3.0.0
