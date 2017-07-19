@@ -43,8 +43,8 @@ RUN set -xe && \
 	
 # Compile Memcached 
 RUN set -xe && \
-	curl -LO https://github.com/php-memcached-dev/php-memcached/archive/v1.0.2.tar.gz && \
-	tar xzf v1.0.2.tar.gz && cd php-memcached-1.0.2 && \
+	curl -LO https://github.com/php-memcached-dev/php-memcached/archive/2.2.0.tar.gz && \
+	tar xzf 2.2.0.tar.gz && cd php-memcached-2.2.0 && \
 	phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install && \
 	echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini && \
 	cd .. && rm -rf php-memcached 
