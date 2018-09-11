@@ -69,7 +69,7 @@ RUN set -xe && \
 
 RUN set -xe && \
 	curl -LO https://github.com/mongodb/mongo-php-driver-legacy/archive/1.6.16.tar.gz && \
-	tar xzf 1.6.16.tar.gz && cd   && phpize && ./configure && make && make install \
+	tar xzf 1.6.16.tar.gz && cd mongo-php-driver-legacy-1.6.16  && phpize && ./configure && make && make install \
 	&& make clean && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini \
 	&& cd ../.. && rm -rf 1.6.16.tar.gz mongo-php-driver-legacy-1.6.16
 
