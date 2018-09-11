@@ -67,6 +67,13 @@ RUN set -xe && \
     echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini && \
     cd ../.. && rm -rf v${PHALCON_VERSION}.tar.gz cphalcon-${PHALCON_VERSION} 
 
+RUN set -xe && \
+	curl -LO https://github.com/mongodb/mongo-php-driver-legacy/archive/1.6.16.tar.gz && \
+	tar xzf 1.6.16.tar.gz && cd   && phpize && ./configure && make && make install \
+	&& make clean && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini \
+	&& cd ../.. && rm -rf 1.6.16.tar.gz mongo-php-driver-legacy-1.6.16
+
+
 RUN docker-php-source extract \
 	&& cd /usr/src/php/ext/bcmath \
 	&& phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install \
