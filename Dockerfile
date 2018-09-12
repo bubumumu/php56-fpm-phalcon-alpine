@@ -132,10 +132,6 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 		&& echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini \
 		&& echo "extension=bcmath.so" > /usr/local/etc/php/conf.d/bcmath.ini \
 		&& echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
-
-#Delete apk
-RUN apk del gcc g++ git make && \
-	rm -rf /tmp/*
 	
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
