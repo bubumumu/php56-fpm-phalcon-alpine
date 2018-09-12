@@ -109,7 +109,8 @@ RUN apk add --update openssl \
 	&& rm -rf /var/cache/apk/* 
 
 COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* /usr/local/lib/php/extensions/no-debug-non-zts-20131226/
-
+ADD conf/php.ini /usr/local/etc/php/php.ini
+ADD conf/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 RUN apk update && apk add ca-certificates && \
     apk add tzdata && \
