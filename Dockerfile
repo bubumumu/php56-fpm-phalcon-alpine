@@ -108,12 +108,7 @@ RUN apk add --update openssl \
 	bzip2 \
 	&& rm -rf /var/cache/apk/* 
 
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/memcached.so usr/local/lib/php/extensions/no-debug-non-zts-20131226/memcached.so
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/bcmath.so usr/local/lib/php/extensions/no-debug-non-zts-20131226/bcmath.so
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/igbinary.so usr/local/lib/php/extensions/no-debug-non-zts-20131226/igbinary.so
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/redis.so usr/local/lib/php/extensions/no-debug-non-zts-20131226/redis.so
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/mongo.so usr/local/lib/php/extensions/no-debug-non-zts-20131226/mongo.so
+COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* /usr/local/lib/php/extensions/no-debug-non-zts-20131226/
 
 
 RUN apk update && apk add ca-certificates && \
