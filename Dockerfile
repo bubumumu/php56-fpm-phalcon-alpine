@@ -108,7 +108,7 @@ RUN apk add --update openssl \
 	bzip2 \
 	&& rm -rf /var/cache/apk/* 
 
-COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* usr/local/lib/php/extensions/no-debug-non-zts-20131226/*
+COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* usr/local/lib/php/extensions/no-debug-non-zts-20131226/
 
 RUN apk update && apk add ca-certificates && \
     apk add tzdata && \
