@@ -7,6 +7,8 @@ ADD conf/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 #Alpine packages
 RUN apk add --update git make gcc g++ \
+	openssl \
+	openssl-dev \
 	libc-dev \
 	autoconf \
 	freetype-dev \
@@ -28,21 +30,24 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
         && docker-php-ext-install bz2 \
         && docker-php-ext-install zip \
         && docker-php-ext-install pdo \
-		&& docker-php-ext-install mcrypt \
         && docker-php-ext-install pdo_mysql \
         && docker-php-ext-install opcache
 
 		
 WORKDIR /usr/src/php/ext/
 
-RUN git clone  https://github.com/igbinary/igbinary.git && \
-	cd igbinary && phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary && make install && \
+RUN set -xe && \
+	curl -LO https://github.com/igbinary/igbinary/archive/2.0.4.tar.gz && \
+	tar xzf 2.0.4.tar.gz && \
+	cd igbinary-2.0.4 && phpize && ./configure CFLAGS="-O2 -g" --enable-igbinary --with-php-config=/usr/local/bin/php-config && make install && \
 	echo "extension=igbinary.so" > /usr/local/etc/php/conf.d/igbinary.ini && \
 	cd ../ && rm -rf igbinary
 	
 # Compile Memcached 
-RUN git clone https://github.com/php-memcached-dev/php-memcached.git && \
-	cd php-memcached && phpize && ./configure && make && make install && \
+RUN set -xe && \
+	curl -LO https://github.com/php-memcached-dev/php-memcached/archive/2.2.0.tar.gz && \
+	tar xzf 2.2.0.tar.gz && cd php-memcached-2.2.0 && \
+	phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install && \
 	echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini && \
 	cd .. && rm -rf php-memcached 
 	
@@ -66,9 +71,10 @@ RUN set -xe && \
 
 RUN set -xe && \
 	curl -LO https://github.com/mongodb/mongo-php-driver-legacy/archive/1.6.16.tar.gz && \
-	tar xzf 1.6.16.tar.gz && cd   && phpize && ./configure && make && make install \
-	&& make clean && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini \
+	tar xzf 1.6.16.tar.gz && cd mongo-php-driver-legacy-1.6.16  && phpize && ./configure && make && make install \
+	&& make clean && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini \
 	&& cd ../.. && rm -rf 1.6.16.tar.gz mongo-php-driver-legacy-1.6.16
+
 
 RUN docker-php-source extract \
 	&& cd /usr/src/php/ext/bcmath \
@@ -83,6 +89,50 @@ RUN set -xe && \
 	phpize && ./configure --enable-xdebug && make && make install && \
 	cd ../ && rm -rf xdebug-XDEBUG_2_4_1
 	
+FROM php:5.6.26-fpm-alpine
+
+LABEL maintainer="longfei6671@163.com"
+
+RUN apk add --update openssl \
+	openssl-dev \
+	libc-dev \
+	freetype-dev \
+	libjpeg-turbo-dev \
+	libpng-dev \
+	libmcrypt-dev \
+	libpcre32 \
+	bzip2 \
+	libbz2 \
+	libmemcached-dev \
+	cyrus-sasl-dev \
+	bzip2 \
+	&& rm -rf /var/cache/apk/* 
+
+COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* usr/local/lib/php/extensions/no-debug-non-zts-20131226/*
+
+RUN apk update && apk add ca-certificates && \
+    apk add tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone
+	
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+        && docker-php-ext-install gd \
+		&& docker-php-ext-install mcrypt \
+        && docker-php-ext-install mysqli \
+        && docker-php-ext-install bz2 \
+        && docker-php-ext-install zip \
+        && docker-php-ext-install pdo \
+        && docker-php-ext-install pdo_mysql \
+        && docker-php-ext-install opcache \
+		&& docker-php-ext-install mcrypt \
+		&& echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini \
+		&& echo "extension=redis.so" > /usr/local/etc/php/conf.d/phpredis.ini \
+		&& echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini \
+		&& echo "extension=igbinary.so" > /usr/local/etc/php/conf.d/igbinary.ini \
+		&& echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini \
+		&& echo "extension=bcmath.so" > /usr/local/etc/php/conf.d/bcmath.ini \
+		&& echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
+
 #Delete apk
 RUN apk del gcc g++ git make && \
 	rm -rf /tmp/*
