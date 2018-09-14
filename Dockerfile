@@ -112,11 +112,6 @@ COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* /usr/loc
 ADD conf/php.ini /usr/local/etc/php/php.ini
 ADD conf/www.conf /usr/local/etc/php-fpm.d/www.conf
 
-RUN apk update && apk add ca-certificates && \
-    apk add tzdata && \
-    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-    echo "Asia/Shanghai" > /etc/timezone
-	
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
         && docker-php-ext-install gd \
 		&& docker-php-ext-install mcrypt \
