@@ -76,11 +76,6 @@ RUN set -xe && \
 	&& make clean && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini \
 	&& cd ../.. && rm -rf 1.6.16.tar.gz mongo-php-driver-legacy-1.6.16
 
-# Compile Yaf
-ENV YAF_VERSION=3.0.6
-RUN set -xe && \
-    curl -LO https://github.com/laruence/yaf/archive/yaf-${YAF_VERSION}.tar.gz && \
-    tar xzf yaf-${YAF_VERSION}.tar.gz && cd yaf-yaf-${YAF_VERSION} && phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install
 
 RUN docker-php-source extract \
 	&& cd /usr/src/php/ext/bcmath \
@@ -111,7 +106,6 @@ RUN apk add --update openssl \
 COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* /usr/local/lib/php/extensions/no-debug-non-zts-20131226/
 ADD conf/php.ini /usr/local/etc/php/php.ini
 ADD conf/www.conf /usr/local/etc/php-fpm.d/www.conf
-ADD conf/yaf.ini /usr/local/etc/php/conf.d/yaf.ini
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
         && docker-php-ext-install gd \
