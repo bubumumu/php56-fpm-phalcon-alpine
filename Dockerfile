@@ -59,22 +59,28 @@ RUN git clone -b master https://github.com/phpredis/phpredis.git \
 	&& docker-php-ext-install phpredis \
 	&& rm -rf phpredis
 	
-ENV PHALCON_VERSION=3.0.1
 
 WORKDIR /usr/src/php/ext/
 # Compile Phalcon
+ENV PHALCON_VERSION=3.0.1
 RUN set -xe && \
     curl -LO https://github.com/phalcon/cphalcon/archive/v${PHALCON_VERSION}.tar.gz && \
     tar xzf v${PHALCON_VERSION}.tar.gz && cd cphalcon-${PHALCON_VERSION}/build && sh install && \
     echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini && \
     cd ../.. && rm -rf v${PHALCON_VERSION}.tar.gz cphalcon-${PHALCON_VERSION} 
 
+# Compile Mongo
 RUN set -xe && \
 	curl -LO https://github.com/mongodb/mongo-php-driver-legacy/archive/1.6.16.tar.gz && \
 	tar xzf 1.6.16.tar.gz && cd mongo-php-driver-legacy-1.6.16  && phpize && ./configure && make && make install \
 	&& make clean && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini \
 	&& cd ../.. && rm -rf 1.6.16.tar.gz mongo-php-driver-legacy-1.6.16
 
+# Compile Yaf
+ENV YAF_VERSION=3.0.6
+RUN set -xe && \
+    curl -LO https://github.com/laruence/yaf/archive/yaf-${YAF_VERSION}.tar.gz && \
+    tar xzf yaf-${YAF_VERSION}.tar.gz && cd yaf-yaf-${YAF_VERSION} && phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install
 
 RUN docker-php-source extract \
 	&& cd /usr/src/php/ext/bcmath \
@@ -82,12 +88,6 @@ RUN docker-php-source extract \
 	&& make clean \
 	&& docker-php-source delete
 
-#Compile XDebug
-RUN set -xe && \
-	curl -LO https://github.com/xdebug/xdebug/archive/XDEBUG_2_4_1.tar.gz && \
-	tar xzf XDEBUG_2_4_1.tar.gz && cd xdebug-XDEBUG_2_4_1 && \
-	phpize && ./configure --enable-xdebug && make && make install && \
-	cd ../ && rm -rf xdebug-XDEBUG_2_4_1
 	
 FROM php:5.6.26-fpm-alpine
 
@@ -111,6 +111,7 @@ RUN apk add --update openssl \
 COPY --from=0 /usr/local/lib/php/extensions/no-debug-non-zts-20131226/* /usr/local/lib/php/extensions/no-debug-non-zts-20131226/
 ADD conf/php.ini /usr/local/etc/php/php.ini
 ADD conf/www.conf /usr/local/etc/php-fpm.d/www.conf
+ADD conf/yaf.ini /usr/local/etc/php/conf.d/yaf.ini
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
         && docker-php-ext-install gd \
@@ -126,15 +127,8 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 		&& echo "extension=redis.so" > /usr/local/etc/php/conf.d/phpredis.ini \
 		&& echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini \
 		&& echo "extension=igbinary.so" > /usr/local/etc/php/conf.d/igbinary.ini \
-		&& echo "zend_extension=xdebug.so" > /usr/local/etc/php/conf.d/xdebug.ini \
 		&& echo "extension=bcmath.so" > /usr/local/etc/php/conf.d/bcmath.ini \
 		&& echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
-	
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
-
-ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 9000
 
