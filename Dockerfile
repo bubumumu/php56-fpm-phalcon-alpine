@@ -51,6 +51,16 @@ RUN set -xe && \
 	echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini && \
 	cd .. && rm -rf php-memcached 
 	
+ENV ZOOKEEPER_VERSION=3.4.9
+RUN wget https://archive.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
+   tar -zxf zookeeper-${ZOOKEEPER_VERSION}.tar.gz && cd zookeeper-${ZOOKEEPER_VERSION}/src/c && \
+   ./configure --prefix=/usr/local/zookeeper-${ZOOKEEPER_VERSION}/ && make && make install
+
+ENV PHP_ZOOKEEPER_VERSION=0.6.4
+RUN wget http://pecl.php.net/get/zookeeper-${PHP_ZOOKEEPER_VERSION}.tgz && \
+   tar -zxvf zookeeper-${PHP_ZOOKEEPER_VERSION}.tgz && cd zookeeper-${PHP_ZOOKEEPER_VERSION} && phpize && ./configure --with-php-config=/usr/local/bin/php-config --with-libzookeeper-dir=/usr/local/zookeeper-${ZOOKEEPER_VERSION}/ && make && make install && \
+    echo "extension=zookeeper.so" > /usr/local/etc/php/conf.d/zookeeper.ini
+    
 # Compile PhpRedis
 ENV PHPREDIS_VERSION=3.0.0
 
